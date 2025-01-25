@@ -308,15 +308,35 @@
             }
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') player.dx = 0;
+        // Touch controls (for mobile)
+        let touchStartX = 0;
+        let isTouching = false;
+
+        canvas.addEventListener('touchstart', (e) => {
+            isTouching = true;
+            touchStartX = e.touches[0].clientX;
         });
 
-        // Start game loop
-        loop();
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isTouching) return;
 
-        // Enter fullscreen on page load
-        enterFullscreen();
+            const touchEndX = e.touches[0].clientX;
+            const diff = touchEndX - touchStartX;
+
+            if (diff > 10) { // Move right
+                player.dx = player.speed;
+            } else if (diff < -10) { // Move left
+                player.dx = -player.speed;
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isTouching = false;
+            player.dx = 0;
+        });
+
+        loop(); // Start the game loop
     </script>
 </body>
 </html>
+
