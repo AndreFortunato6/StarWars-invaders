@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family:'Press Start 2P', cursive;
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+           
+        }
+        .option {
+            margin: 20px 0;
+        }
+        .selection {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .selection div {
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        .selection div:hover {
+            border-color: lime;
+        }
+        button {
+            padding: 10px 20px;
+            background: lime;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <audio autoplay hidden>
+        <source src="Star Wars Theme Song By John Williams.mp3" type="audio/mp3">
+    </audio>
+    <h1>Escolha suas naves</h1>
+
+    <div class="option">
+        <h2>Sua nave</h2>
+        <div class="selection" id="playerOptions">
+            <div style="background-image: url('millennium\ falcon.png');" onclick="selectPlayerImage('millennium\ falcon.png')"></div>
+            <div style="background-image: url('jedi-removebg-preview.png');" onclick="selectPlayerImage('jedi-removebg-preview.png')"></div>
+            <div style="background-image: url('snowspeeder.png');" onclick="selectPlayerImage('snowspeeder.png')"></div>
+            <div style="background-image: url('x_wing-removebg-preview.png');" onclick="selectPlayerImage('x_wing-removebg-preview.png')"></div>
+            
+        </div>
+    </div>
+
+    <div class="option">
+        <h2>Naves inimigas</h2>
+        <div class="selection" id="enemyOptions">
+            <div style="background-image: url('slave1.png');" onclick="selectEnemyImage('slave1.png')"></div>
+            <div style="background-image: url('download-removebg-preview.png');" onclick="selectEnemyImage('download-removebg-preview.png')"></div>
+            <div style="background-image: url('star_destroyer-removebg-preview\ \(1\).png');" onclick="selectEnemyImage('star_destroyer-removebg-preview\ \(1\).png')"></div>
+            <div style="background-image: url('malevolence.png');" onclick="selectEnemyImage('malevolence.png')"></div>
+        </div>
+    </div>
+
+    <button onclick="startGame()">Start Game</button>
+
+    <script>
+        let playerImage = '';
+        let enemyImage = '';
+
+        function selectPlayerImage(image) {
+            playerImage = image;
+            localStorage.setItem('playerImage', playerImage);
+            highlightSelection('playerOptions', image);
+        }
+
+        function selectEnemyImage(image) {
+            enemyImage = image;
+            localStorage.setItem('enemyImage', enemyImage);
+            highlightSelection('enemyOptions', image);
+        }
+
+        function highlightSelection(containerId, selectedImage) {
+            const container = document.getElementById(containerId);
+            Array.from(container.children).forEach(div => {
+                if (div.style.backgroundImage.includes(selectedImage)) {
+                    div.style.borderColor = 'lime';
+                } else {
+                    div.style.borderColor = 'white';
+                }
+            });
+        }
+
+        function startGame() {
+            if (!playerImage || !enemyImage) {
+                alert('Please select both player and enemy images!');
+                return;
+            }
+            window.location.href = 'space.html';
+        }
+    </script>
+</body>
+</html>
