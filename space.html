@@ -15,71 +15,161 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
         }
-
         canvas {
             display: block;
             background: rgb(0, 0, 0);
+            touch-action: none; /* Prevents default touch behavior */
             width: 100%;
             height: 100%;
-        }
-
-        .score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div class="score" id="score">Score: 0</div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Function to handle fullscreen mode
+        function enterFullscreen() {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.mozRequestFullScreen) {
+                canvas.mozRequestFullScreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        }
+
+        // Lock the orientation to landscape
+        if (window.screen.orientation) {
+            window.screen.orientation.lock('landscape')
+                .catch(function(error) {
+                    console.log("Orientation lock failed:", error);
+                });
+        }
+
+        // Listen for resize event to update canvas size
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Set canvas size initially
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const playerImageSrc = 'player.png';
-        const enemyImageSrc = 'enemy.png';
+        // Load images from localStorage or default
+        const playerImageSrc = localStorage.getItem('playerImage') || 'player.png';
+        const enemyImageSrc = localStorage.getItem('enemyImage') || 'enemy.png';
 
-        // Player object
-        const player = {
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 120,
-            width: 100,
-            height: 100,
-            color: 'lime',
-            speed: 7,
-            dx: 0,
-            image: playerImageSrc
+        // Image objects
+        const playerImage = new Image();
+        const enemyImage = new Image();
+
+        playerImage.src = playerImageSrc;
+        enemyImage.src = enemyImageSrc;
+
+        // Wait for images to load before starting the game
+        let imagesLoaded = false;
+        playerImage.onload = enemyImage.onload = function() {
+            imagesLoaded = true;
         };
 
-        // Bullets array
-        const bullets = [];
-        const bulletSpeed = 10;
-
-        // Enemy array and speed
-        const enemies = [];
-        const enemyWidth = 100;
-        const enemyHeight = 100;
-        const enemySpeed = 2;
+        // Player
+        const player = {
+            x: canvas.width / 2 - 75,
+            y: canvas.height - 160,
+            width: 150,
+            height: 150,
+            speed: 7,
+            dx: 0,
+            image: playerImage
+        };
 
         // Score
         let score = 0;
 
         function drawScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
+            ctx.fillStyle = 'white';
+            ctx.font = '20px "Press Start 2P", cursive';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
+
+        // Bullets
+        const bullets = [];
+        const bulletSpeed = 10;
+
+        // Enemies
+        let enemies = [];
+        const enemyWidth = 150;
+        const enemyHeight = 150;
+        let enemySpeed = 2; // Initial speed
+        let enemySpawnInterval = 2000;
+
+        function spawnEnemy() {
+            const x = Math.random() * (canvas.width - enemyWidth);
+            enemies.push({
+                x,
+                y: -enemyHeight,
+                width: enemyWidth,
+                height: enemyHeight,
+                isAlive: true,
+                image: enemyImage
+            });
+        }
+
+        setInterval(spawnEnemy, enemySpawnInterval);
+
+        // Increase enemy speed over time
+        function increaseEnemySpeed() {
+            enemySpeed += 0.1; // Increase speed gradually
+        }
+
+        setInterval(increaseEnemySpeed, 5000); // Speed increases every 5 seconds
+
+        // Starry background
+        const stars = [];
+        const starCount = 100;
+
+        for (let i = 0; i < starCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.2
+            });
+        }
+
+        function drawStars() {
+            ctx.fillStyle = 'white';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function moveStars() {
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
         }
 
         // Draw player
         function drawPlayer() {
-            const img = new Image();
-            img.src = player.image;
-            ctx.drawImage(img, player.x, player.y, player.width, player.height);
+            if (imagesLoaded) {
+                ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+            }
         }
 
         // Draw bullets
@@ -94,9 +184,7 @@
         function drawEnemies() {
             enemies.forEach(enemy => {
                 if (enemy.isAlive) {
-                    const img = new Image();
-                    img.src = enemy.image;
-                    ctx.drawImage(img, enemy.x, enemy.y, enemy.width, enemy.height);
+                    ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
                 }
             });
         }
@@ -105,6 +193,7 @@
         function movePlayer() {
             player.x += player.dx;
 
+            // Prevent player from moving out of bounds
             if (player.x < 0) player.x = 0;
             if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
         }
@@ -113,9 +202,7 @@
         function moveBullets() {
             bullets.forEach((bullet, index) => {
                 bullet.y -= bulletSpeed;
-                if (bullet.y + bullet.height < 0) {
-                    bullets.splice(index, 1);
-                }
+                if (bullet.y + bullet.height < 0) bullets.splice(index, 1);
             });
         }
 
@@ -131,6 +218,7 @@
 
         // Detect collisions
         function detectCollisions() {
+            // Check bullet-enemy collisions
             bullets.forEach((bullet, bulletIndex) => {
                 enemies.forEach((enemy, enemyIndex) => {
                     if (
@@ -143,10 +231,28 @@
                         enemy.isAlive = false;
                         bullets.splice(bulletIndex, 1);
                         enemies.splice(enemyIndex, 1);
-                        score += 10;
+                        score += 10; // Increment score
                     }
                 });
             });
+
+            // Check enemy-player collisions
+            enemies.forEach(enemy => {
+                if (
+                    enemy.isAlive &&
+                    player.x < enemy.x + enemy.width &&
+                    player.x + player.width > enemy.x &&
+                    player.y < enemy.y + enemy.height &&
+                    player.y + player.height > enemy.y
+                ) {
+                    redirectToGameOver();
+                }
+            });
+        }
+
+        // Redirect to game over screen
+        function redirectToGameOver() {
+            window.location.href = 'gameover.html'; // Replace with your Game Over screen URL
         }
 
         // Update game objects
@@ -154,12 +260,14 @@
             movePlayer();
             moveBullets();
             moveEnemies();
+            moveStars();
             detectCollisions();
         }
 
         // Draw everything
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawStars();
             drawPlayer();
             drawBullets();
             drawEnemies();
@@ -168,12 +276,14 @@
 
         // Game loop
         function loop() {
-            update();
-            draw();
+            if (imagesLoaded) {
+                update();
+                draw();
+            }
             requestAnimationFrame(loop);
         }
 
-        // Controls (Desktop)
+        // Keyboard controls (for desktop)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') player.dx = -player.speed;
             if (e.key === 'ArrowRight') player.dx = player.speed;
@@ -187,48 +297,29 @@
             }
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') player.dx = 0;
-        });
-
-        // Controls (Mobile)
+        // Touch controls (for mobile)
         let touchStartX = 0;
-        let touchEndX = 0;
+        let isTouching = false;
 
-        document.addEventListener('touchstart', (e) => {
+        canvas.addEventListener('touchstart', (e) => {
+            isTouching = true;
             touchStartX = e.touches[0].clientX;
         });
 
-        document.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].clientX;
-            if (touchStartX - touchEndX > 50) {
-                player.dx = -player.speed; // Swipe Left
-            } else if (touchEndX - touchStartX > 50) {
-                player.dx = player.speed; // Swipe Right
+        canvas.addEventListener('touchmove', (e) => {
+            if (isTouching) {
+                const touchX = e.touches[0].clientX;
+                const touchDiff = touchX - touchStartX;
+                player.dx = touchDiff > 0 ? player.speed : -player.speed;
             }
         });
 
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Prevent scrolling on mobile
+        canvas.addEventListener('touchend', () => {
+            isTouching = false;
+            player.dx = 0;
         });
 
-        // Spawn enemies
-        function spawnEnemy() {
-            const x = Math.random() * (canvas.width - enemyWidth);
-            enemies.push({
-                x: x,
-                y: -enemyHeight,
-                width: enemyWidth,
-                height: enemyHeight,
-                isAlive: true,
-                image: enemyImageSrc
-            });
-        }
-
-        setInterval(spawnEnemy, 2000);
-
-        // Start game loop
-        loop();
+        loop(); // Start the game loop
     </script>
 </body>
 </html>
