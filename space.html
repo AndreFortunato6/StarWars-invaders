@@ -28,7 +28,7 @@
         }
 
         #shootButton {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             right: 20px;
             background-color: red;
@@ -37,6 +37,7 @@
             width: 70px;
             height: 70px;
             cursor: pointer;
+            z-index: 10; /* Ensures it stays on top */
         }
     </style>
 </head>
@@ -202,7 +203,7 @@
 
         // Draw bullets
         function drawBullets() {
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'white';
             bullets.forEach(bullet => {
                 ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
             });
