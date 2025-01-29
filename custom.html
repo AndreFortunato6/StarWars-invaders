@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family:'Press Start 2P', cursive;
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .option {
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+        .selection {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .selection div {
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        .selection div:hover {
+            border-color: yellow;
+        }
+        button {
+            padding: 10px 20px;
+            background:yellow;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        button:hover {
+            background: orange;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starCanvas"></canvas>
+    <audio autoplay hidden>
+        <source src="Star Wars Theme Song By John Williams.mp3" type="audio/mp3">
+    </audio>
+    <h1>Escolha suas naves</h1>
+
+    <div class="option">
+        <h2>Sua nave</h2>
+        <div class="selection" id="playerOptions">
+            <div style="background-image: url('millennium\ falcon.png');" onclick="selectPlayerImage('millennium\ falcon.png')"></div>
+            <div style="background-image: url('jedi-removebg-preview.png');" onclick="selectPlayerImage('jedi-removebg-preview.png')"></div>
+            <div style="background-image: url('snowspeeder.png');" onclick="selectPlayerImage('snowspeeder.png')"></div>
+            <div style="background-image: url('x_wing-removebg-preview.png');" onclick="selectPlayerImage('x_wing-removebg-preview.png')"></div>
+        </div>
+    </div>
+
+    <div class="option">
+        <h2>Naves inimigas</h2>
+        <div class="selection" id="enemyOptions">
+            <div style="background-image: url('slave1.png');" onclick="selectEnemyImage('slave1.png')"></div>
+            <div style="background-image: url('download-removebg-preview.png');" onclick="selectEnemyImage('download-removebg-preview.png')"></div>
+            <div style="background-image: url('star_destroyer-removebg-preview\ \(1\).png');" onclick="selectEnemyImage('star_destroyer-removebg-preview\ \(1\).png')"></div>
+            <div style="background-image: url('malevolence.png');" onclick="selectEnemyImage('malevolence.png')"></div>
+        </div>
+    </div>
+
+    <button onclick="startGame()">Start Game</button>
+
+    <script>
+        let playerImage = '';
+        let enemyImage = '';
+
+        function selectPlayerImage(image) {
+            playerImage = image;
+            localStorage.setItem('playerImage', playerImage);
+            highlightSelection('playerOptions', image);
+        }
+
+        function selectEnemyImage(image) {
+            enemyImage = image;
+            localStorage.setItem('enemyImage', enemyImage);
+            highlightSelection('enemyOptions', image);
+        }
+
+        function highlightSelection(containerId, selectedImage) {
+            const container = document.getElementById(containerId);
+            Array.from(container.children).forEach(div => {
+                if (div.style.backgroundImage.includes(selectedImage)) {
+                    div.style.borderColor = 'lime';
+                } else {
+                    div.style.borderColor = 'white';
+                }
+            });
+        }
+
+        function startGame() {
+            if (!playerImage || !enemyImage) {
+                alert('Please select both player and enemy images!');
+                return;
+            }
+            window.location.href = 'space.html';
+        }
+
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = Array.from({ length: 100 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            speed: Math.random() * 2 + 1
+        }));
+
+        function drawStars() {
+            ctx.fillStyle = 'white';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function moveStars() {
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+        }
+
+        function animate() {
+            moveStars();
+            drawStars();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

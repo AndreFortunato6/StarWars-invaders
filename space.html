@@ -16,6 +16,8 @@
             align-items: center;
             height: 100vh;
             width: 100vw;
+            flex-direction: column;
+            align-items: center;
         }
         canvas {
             display: block;
@@ -24,6 +26,17 @@
             width: 100%;
             height: 100%;
         }
+        #shootButton {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: red;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -31,6 +44,7 @@
         <source src="10. The Asteroid Field.mp3" type="audio/mp3">
     </audio>
     <canvas id="gameCanvas"></canvas>
+    <button id="shootButton"></button>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -313,13 +327,23 @@
             if (isTouching) {
                 const touchX = e.touches[0].clientX;
                 const touchDiff = touchX - touchStartX;
-                player.dx = touchDiff > 0 ? player.speed : -player.speed;
+                player.dx = touchDiff / 10; // Smooth sliding of the player
             }
         });
 
         canvas.addEventListener('touchend', () => {
             isTouching = false;
             player.dx = 0;
+        });
+
+        // Shoot button functionality
+        document.getElementById('shootButton').addEventListener('click', () => {
+            bullets.push({
+                x: player.x + player.width / 2 - 2.5,
+                y: player.y,
+                width: 5,
+                height: 10
+            });
         });
 
         loop(); // Start the game loop

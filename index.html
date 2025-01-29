@@ -1,119 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customization</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
+    <title>Star Wars Intro</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
         body {
-            font-family:'Press Start 2P', cursive;
-            background: #222;
-            color: white;
-            text-align: center;
-            padding: 20px;
-           
+            margin: 0;
+            overflow: hidden;
+            background: black;
+            font-family: 'Press Start 2P', cursive;
         }
-        .option {
-            margin: 20px 0;
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
-        .selection {
+        .container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
+            align-items: center;
         }
-        .selection div {
-            width: 100px;
-            height: 100px;
-            border: 2px solid white;
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
+        img {
+            width: 100vw;
+            max-width: 100%;
+            animation: shrink 5s forwards;
         }
-        .selection div:hover {
-            border-color: lime;
+        @keyframes shrink {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(0.1); opacity: 0; }
+        }
+        .button-container {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            text-align: center;
         }
         button {
             padding: 10px 20px;
-            background: lime;
+            font-size: 18px;
+            background-color: yellow;
             border: none;
-            color: black;
-            font-size: 16px;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 25%;
+            display: none;
         }
         button:hover {
-            background: green;
+            background-color: orange;
+        }
+        .loading-container {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .loading-text {
+            color: yellow;
+            font-size: 16px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .loading-bar {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(255, 255, 0, 0.3);
+            margin: 5px auto;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .loading-progress {
+            width: 0;
+            height: 100%;
+            background: yellow;
         }
     </style>
 </head>
 <body>
-    <audio autoplay hidden>
-        <source src="Star Wars Theme Song By John Williams.mp3" type="audio/mp3">
+    <canvas id="starCanvas"></canvas>
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Star_Wars_Logo.svg" alt="Star Wars Logo">
+    </div>
+    <div class="button-container">
+        <button id="startButton" onclick="window.location.href='custom.html'">Avançar</button>
+    </div>
+    <div class="loading-container">
+        <div class="loading-text">Carregando...</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+    </div>
+    <audio autoplay loop>
+        <source src="Star Wars Theme Song By John Williams.mp3" type="audio/mpeg">
+        Seu navegador não suporta áudio.
     </audio>
-    <h1>Escolha suas naves</h1>
-
-    <div class="option">
-        <h2>Sua nave</h2>
-        <div class="selection" id="playerOptions">
-            <div style="background-image: url('millennium\ falcon.png');" onclick="selectPlayerImage('millennium\ falcon.png')"></div>
-            <div style="background-image: url('jedi-removebg-preview.png');" onclick="selectPlayerImage('jedi-removebg-preview.png')"></div>
-            <div style="background-image: url('snowspeeder.png');" onclick="selectPlayerImage('snowspeeder.png')"></div>
-            <div style="background-image: url('x_wing-removebg-preview.png');" onclick="selectPlayerImage('x_wing-removebg-preview.png')"></div>
-            
-        </div>
-    </div>
-
-    <div class="option">
-        <h2>Naves inimigas</h2>
-        <div class="selection" id="enemyOptions">
-            <div style="background-image: url('slave1.png');" onclick="selectEnemyImage('slave1.png')"></div>
-            <div style="background-image: url('download-removebg-preview.png');" onclick="selectEnemyImage('download-removebg-preview.png')"></div>
-            <div style="background-image: url('star_destroyer-removebg-preview\ \(1\).png');" onclick="selectEnemyImage('star_destroyer-removebg-preview\ \(1\).png')"></div>
-            <div style="background-image: url('malevolence.png');" onclick="selectEnemyImage('malevolence.png')"></div>
-        </div>
-    </div>
-
-    <button onclick="startGame()">Start Game</button>
 
     <script>
-        let playerImage = '';
-        let enemyImage = '';
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        function selectPlayerImage(image) {
-            playerImage = image;
-            localStorage.setItem('playerImage', playerImage);
-            highlightSelection('playerOptions', image);
+        const stars = Array.from({ length: 100 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            speed: Math.random() * 2 + 1
+        }));
+
+        function drawStars() {
+            ctx.fillStyle = 'white';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
         }
 
-        function selectEnemyImage(image) {
-            enemyImage = image;
-            localStorage.setItem('enemyImage', enemyImage);
-            highlightSelection('enemyOptions', image);
-        }
-
-        function highlightSelection(containerId, selectedImage) {
-            const container = document.getElementById(containerId);
-            Array.from(container.children).forEach(div => {
-                if (div.style.backgroundImage.includes(selectedImage)) {
-                    div.style.borderColor = 'lime';
-                } else {
-                    div.style.borderColor = 'white';
+        function moveStars() {
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
                 }
             });
         }
 
-        function startGame() {
-            if (!playerImage || !enemyImage) {
-                alert('Please select both player and enemy images!');
-                return;
-            }
-            window.location.href = 'space.html';
+        function animate() {
+            moveStars();
+            drawStars();
+            requestAnimationFrame(animate);
         }
+
+        animate();
+
+        let progress = 0;
+        const progressBar = document.getElementById('loadingProgress');
+        const startButton = document.getElementById('startButton');
+        
+        function updateProgress() {
+            progress += 1;
+            progressBar.style.width = progress + '%';
+            if (progress < 100) {
+                setTimeout(updateProgress, 50);
+            } else {
+                startButton.style.display = 'inline-block';
+            }
+        }
+        
+        updateProgress();
     </script>
 </body>
 </html>
