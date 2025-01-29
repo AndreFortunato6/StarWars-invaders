@@ -43,8 +43,7 @@
     </style>
 </head>
 <body>
-    <audio autoplay hidden>
-        <source src="10. The Asteroid Field.mp3" type="audio/mp3">
+    <audio src="10. The Asteroid Field.mp3" controls autoplay loop hidden >
     </audio>
     <canvas id="gameCanvas"></canvas>
     <button id="shootButton" >Shoot</button>
@@ -169,7 +168,7 @@
 
         // Draw bullets
         function drawBullets() {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'red';
             bullets.forEach(bullet => {
                 ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
             });

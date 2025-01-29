@@ -57,6 +57,7 @@
             border-radius: 5px;
             margin-top: 20px;
             position: relative;
+            font-family:'Press Start 2P', cursive;
             z-index: 1;
         }
         button:hover {
@@ -66,8 +67,7 @@
 </head>
 <body>
     <canvas id="starCanvas"></canvas>
-    <audio autoplay hidden>
-        <source src="Star Wars Theme Song By John Williams.mp3" type="audio/mp3">
+    <audio src="Star Wars- The Imperial March (Darth Vader's Theme).mp3" controls autoplay loop hidden >
     </audio>
     <h1>Escolha suas naves</h1>
 
@@ -122,7 +122,7 @@
 
         function startGame() {
             if (!playerImage || !enemyImage) {
-                alert('Please select both player and enemy images!');
+                alert('Selecione as naves do jogo!');
                 return;
             }
             window.location.href = 'space.html';
