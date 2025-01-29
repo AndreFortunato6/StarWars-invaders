@@ -53,29 +53,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Function to request fullscreen mode
-        function enterFullscreen() {
-            if (canvas.requestFullscreen) {
-                canvas.requestFullscreen();
-            } else if (canvas.mozRequestFullScreen) {
-                canvas.mozRequestFullScreen();
-            } else if (canvas.webkitRequestFullscreen) {
-                canvas.webkitRequestFullscreen();
-            } else if (canvas.msRequestFullscreen) {
-                canvas.msRequestFullscreen();
-            }
-        }
-
-        // Automatically enter fullscreen when the page loads
-        window.onload = () => {
-            setTimeout(enterFullscreen, 100); // Delayed to ensure the page fully loads
-        }
-
-        // Listen for resize event to update canvas size
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+     
 
         // Set canvas size initially
         canvas.width = window.innerWidth;
