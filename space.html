@@ -6,26 +6,27 @@
     <title>Space Invaders</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body {
+        html, body {
             margin: 0;
+            padding: 0;
+            height: 100%;
             overflow: hidden;
             background: black;
             font-family: 'Press Start 2P', cursive;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            width: 100vw;
-            flex-direction: column;
-            align-items: center;
+            width: 100%;
         }
+
         canvas {
-            display: block;
-            background: rgb(0, 0, 0);
-            touch-action: none; /* Prevents default touch behavior */
             width: 100%;
             height: 100%;
+            display: block;
+            background: rgb(0, 0, 0);
+            touch-action: none;
         }
+
         #shootButton {
             position: absolute;
             bottom: 20px;
@@ -50,7 +51,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Function to handle fullscreen mode
+        // Function to request fullscreen mode
         function enterFullscreen() {
             if (canvas.requestFullscreen) {
                 canvas.requestFullscreen();
@@ -63,13 +64,23 @@
             }
         }
 
-        // Lock the orientation to landscape
-        if (window.screen.orientation) {
-            window.screen.orientation.lock('landscape')
-                .catch(function(error) {
-                    console.log("Orientation lock failed:", error);
-                });
-        }
+        // Request fullscreen on touchstart for mobile devices
+        document.body.addEventListener('touchstart', function() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        });
+
+        // Ensure fullscreen mode when the page is loaded (desktop)
+        window.onload = function() {
+            enterFullscreen();
+        };
 
         // Listen for resize event to update canvas size
         window.addEventListener('resize', () => {
