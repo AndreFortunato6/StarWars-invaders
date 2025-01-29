@@ -65,23 +65,10 @@
             }
         }
 
-        // Request fullscreen on touchstart for mobile devices
-        document.body.addEventListener('touchstart', function() {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) {
-                document.documentElement.msRequestFullscreen();
-            }
-        });
-
-        // Listen for the user interaction to request fullscreen on mobile
-        document.body.addEventListener('click', () => {
-            enterFullscreen();
-        });
+        // Automatically enter fullscreen when the page loads
+        window.onload = () => {
+            setTimeout(enterFullscreen, 100); // Delayed to ensure the page fully loads
+        }
 
         // Listen for resize event to update canvas size
         window.addEventListener('resize', () => {
