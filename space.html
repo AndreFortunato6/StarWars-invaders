@@ -77,10 +77,10 @@
             }
         });
 
-        // Ensure fullscreen mode when the page is loaded (desktop)
-        window.onload = function() {
+        // Listen for the user interaction to request fullscreen on mobile
+        document.body.addEventListener('click', () => {
             enterFullscreen();
-        };
+        });
 
         // Listen for resize event to update canvas size
         window.addEventListener('resize', () => {
@@ -202,7 +202,7 @@
 
         // Draw bullets
         function drawBullets() {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'red';
             bullets.forEach(bullet => {
                 ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
             });
