@@ -32,6 +32,7 @@
 
     .npc-wrapper {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 20px;
@@ -42,7 +43,8 @@
     }
 
     .npc-image {
-      width: 500px;
+      width: 100%;
+      max-width: 300px;
       height: auto;
       position: relative;
       transition: transform 0.6s ease, opacity 0.6s ease;
@@ -61,6 +63,11 @@
     .enter-left-active {
       transform: translateX(0);
       opacity: 1;
+    }
+
+    .npc-image.exit-left,
+    .npc-image.enter-left-active {
+      transition: transform 0.6s ease, opacity 0.6s ease;
     }
 
     #skip-btn {
@@ -102,9 +109,26 @@
       background: orange;
     }
 
-    .npc-image.exit-left,
-    .npc-image.enter-left-active {
-      transition: transform 0.6s ease, opacity 0.6s ease;
+    /* Responsividade */
+    @media (max-width: 600px) {
+      #dialogue {
+        font-size: 10px;
+        padding: 10px;
+      }
+
+      #talk-btn,
+      #skip-btn {
+        font-size: 10px;
+        padding: 8px 12px;
+      }
+
+      h1 {
+        font-size: 16px;
+      }
+
+      body {
+        padding: 10px;
+      }
     }
   </style>
 </head>
@@ -119,21 +143,19 @@
       <button id="skip-btn" onclick="window.location.href='custom.html'">Skip</button>
     </div>
 
-    <div id="dialogue"></div>
+    <div id="dialogue">E aí, preparado?</div>
     <button id="talk-btn">Falar</button>
   </div>
 
   <script>
     const dialogues = [
-      "Tenho uma missão pra você",
       "E aí, preparado?",
       "A galáxia precisa de você, garoto.",
-      "Escolha sua nave com sabedoria... Pessoalmente, eu recomendo a Falcon... Foi ela quem fez o percurso de Kessel em menos de 15 parsecs! Só que eu quero ela SEM NENHUM ARRANHÃO!",
-      "Pressione o botão shoot para atirar, e não deixe eles fugirem de nós, garoto. Tome cuidado. A cada segundo eles se superam..."
+      "Escolha sua nave com sabedoria...Pessoalmente, eu recomendo a Falcon...Foi ela quem fez o percurso de Kessel em menos de 15 parsecs! Só que eu quero ela SEM NENHUM ARRANHÃO!",
+      "Pressione o botão shoot para atirar, e não deixe eles fugirem de nós, garoto."
     ];
 
     const images = [
-      "image-removebg-preview (3).png",
       "image-removebg-preview (3).png",
       "image-removebg-preview (3).png",
       "image-removebg-preview (3).png",
@@ -145,9 +167,9 @@
     const dialogueBox = document.getElementById('dialogue');
     const skipBtn = document.getElementById('skip-btn');
 
+    // Animação de entrada inicial
     window.addEventListener('load', () => {
       npcImg.classList.add('enter-left');
-      dialogueBox.innerText = dialogues[0]; // mostra primeiro diálogo
       requestAnimationFrame(() => {
         npcImg.classList.add('enter-left-active');
       });
@@ -159,18 +181,20 @@
 
       setTimeout(() => {
         clickCount++;
+
         if (clickCount < dialogues.length) {
           dialogueBox.innerText = dialogues[clickCount];
-          npcImg.src = images[clickCount] || images[images.length - 1];
+          npcImg.src = images[clickCount];
 
           npcImg.classList.remove('exit-left');
           npcImg.classList.add('enter-left');
+
           requestAnimationFrame(() => {
             npcImg.classList.add('enter-left-active');
           });
         }
 
-        if (clickCount === dialogues.length - 1) {
+        if (clickCount === 3) {
           skipBtn.style.display = 'inline-block';
         }
       }, 600);
