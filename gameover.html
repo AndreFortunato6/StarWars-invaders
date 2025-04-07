@@ -15,6 +15,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         canvas {
@@ -29,8 +30,20 @@
         h1 {
             color: white;
             font-size: 40px;
-            text-align: center;
             margin-bottom: 20px;
+        }
+
+        .npc-image {
+            width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .npc-quote {
+            color: white;
+            font-size: 12px;
+            max-width: 600px;
+            margin-bottom: 30px;
         }
 
         .button-container {
@@ -60,8 +73,19 @@
     <audio autoplay hidden>
         <source src="13. Yoda And The Force.mp3" type="audio/mp3">
     </audio>
+
     <canvas id="backgroundCanvas"></canvas>
+
     <h1>Game Over</h1>
+
+    <!-- Imagem do personagem -->
+    <img class="npc-image" src="yoda.png" alt="yoda">
+
+    <!-- Fala estática -->
+    <div class="npc-quote">
+        “Faça ou não. Tentativa não há!”
+    </div>
+
     <div class="button-container">
         <div class="button" id="retryButton">Retry</div>
         <div class="button" id="menuButton">Main Menu</div>
@@ -74,7 +98,6 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Starry background
         const stars = [];
         const starCount = 100;
 
@@ -113,19 +136,15 @@
             requestAnimationFrame(animateBackground);
         }
 
-        // Button event handlers
-        const retryButton = document.getElementById('retryButton');
-        const menuButton = document.getElementById('menuButton');
-
-        retryButton.addEventListener('click', () => {
+        // Botões
+        document.getElementById('retryButton').addEventListener('click', () => {
             window.location.href = 'space.html'; 
         });
 
-        menuButton.addEventListener('click', () => {
+        document.getElementById('menuButton').addEventListener('click', () => {
             window.location.href = 'index.html'; 
         });
 
-        // Start the star animation
         animateBackground();
     </script>
 </body>
